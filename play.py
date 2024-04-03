@@ -1,28 +1,26 @@
 import gymnasium as gym
 import matplotlib.pyplot as plt
-from othello_state import OthelloState
 
 from env_operations import EnvOps as eo
 
+from othello_state import OthelloState
+from mcts.searcher.mcts import MCTS
+
+
 def main():
 
-    env = gym.make("ALE/Othello-v5", render_mode="rgb_array", obs_type="grayscale", frameskip=4)
+    env = gym.make("ALE/Othello-v5", render_mode="human", obs_type="grayscale")
     env.reset()
 
     observation, reward, terminated, trunc, info = eo.nfs_step(env, 0)
-    game_state = OthelloState(env, observation, (1,1))
-    actions = game_state.get_possible_actions()
-    print(actions)
 
-    # env.close()
+    #FIXME: bot is playing as both players, backend assumes playing as white -> read MCTS implementation
 
     # rgb = env.render()
-
     # plt.imshow(rgb)
     # plt.show()
-    # input()
-
-    # init_state = OthelloState(env)
+ 
+    # init_state = OthelloState(env, observation)
     # searcher = MCTS(time_limit=1000)
     # action = searcher.search(initial_state=init_state)
     # print(action)
