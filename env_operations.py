@@ -5,9 +5,8 @@ class EnvOps():
     #wrapper to deal with frameskip
     def nfs_step(env, move):
         observation, reward, terminated, trunc, info = env.step(move)
-        env.step(move)
-        env.step(move)
-        env.step(move)
+        for i in range(3):
+            env.step(move)
         return observation, reward, terminated, trunc, info
 
     def get_pixels(coords):
@@ -27,18 +26,19 @@ class EnvOps():
                     empty_squares.append((x,y))
         return empty_squares
 
-    def check_square_validity(env, curr_coord, check_coord) -> bool: #, board, player
-        temp_env = deepcopy(env)
-        reward = 0
-        moves = EnvOps.get_moves_to_position(curr_coord, check_coord)
-        for move in moves:
-            EnvOps.nfs_step(temp_env, move)
-        observation, reward, terminated, trunc, info = EnvOps.nfs_step(temp_env, 1)
-        if reward != 0:
-            return True
-        return False
+    #square validity check using env.step()
+    # def check_square_validity(env, curr_coord, check_coord) -> bool: #, board, player
+    #     temp_env = deepcopy(env)
+    #     reward = 0
+    #     moves = EnvOps.get_moves_to_position(curr_coord, check_coord)
+    #     for move in moves:
+    #         EnvOps.nfs_step(temp_env, move)
+    #     observation, reward, terminated, trunc, info = EnvOps.nfs_step(temp_env, 1)
+    #     if reward != 0:
+    #         return True
+    #     return False
 
-    '''
+    #square validity check using manual check of game state
     def check_square_validity(curr_coord, board, player) -> bool:
         #get coords for 8 adjacent squares
         adj_squares = []
@@ -81,7 +81,6 @@ class EnvOps():
                     case 104:   #empty square, check next adjacent opponent square/axis
                         break
         return False
-    '''
     
     #returns coords resulting from moving one position
     def move_one(start, move):

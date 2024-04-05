@@ -27,7 +27,7 @@ class OthelloState(BaseState):
         if not valid_actions:
             return (-1, -1)
         end = time.time()
-        print("finished getting actions, took " + str(end-start) + " s")
+        print("finished getting actions, took " + str(end-start) + " secs")
         return valid_actions
         
 

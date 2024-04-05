@@ -8,45 +8,33 @@ from mcts.searcher.mcts import MCTS
 
 def main():
 
-    env = gym.make("ALE/Othello-v5", render_mode="rgb_array", obs_type="grayscale")
-    env.reset()
+    env = gym.make("ALE/Othello-v5", mode=1, render_mode="human", obs_type="grayscale", frameskip=4)
+    observation = env.reset()
 
-    observation, reward, terminated, trunc, info = eo.nfs_step(env, 0)
+    terminated=False
+    player = 1
+    curr_coords = (8,1)
+    while not terminated:
+        square = input("square: ")
+        square = tuple(map(int, square.split(',')))
+        print("square: " + str(square))
+        moves = eo.get_moves_to_position(curr_coords, square)
+        for move in moves:
+            eo.nfs_step(env, move)
+        observation, reward, terminated, trunc, info = eo.nfs_step(env, 1)
+        curr_coords = square
+        player *= -1
+        print("reward: " + str(reward))
 
-    #running single game
-    # coords = (8,1)
-    # player = 1
 
-    # while not terminated:   #take a turn
-    #     es = eo.get_empty_squares(observation)
-    #     valid_squares = []
-    #     for s in es:
-    #         if eo.check_square_validity(env, coords, s):
-    #             valid_squares.append(s)
-        
-        
-    #     print("valid squares: " + str(valid_squares))
-    #     print("moving to " + str(valid_squares[0]))
-    #     moves = eo.get_moves_to_position(coords, valid_squares[0])
-    #     for move in moves:
-    #         eo.nfs_step(env, move)
-        
-    #     observation, reward, terminated, trunc, info = eo.nfs_step(env, 1)
-    #     print("placing at " + str(valid_squares[0]) + " reward: " + str(reward))
-    #     coords = valid_squares[0]
-    #     player *= -1
-
-    #     rgb = env.render()
-    #     plt.imshow(rgb)
-    #     plt.show()
-
-    try:
-        init_state = OthelloState(env, observation)
-        searcher = MCTS(time_limit=1000)
-        action = searcher.search(initial_state=init_state)
-        print(action)
-    except Exception as e:
-        print(e)
+    #trying to run mcts
+    # try:
+    #     init_state = OthelloState(env, observation)
+    #     searcher = MCTS(time_limit=1000)
+    #     action = searcher.search(initial_state=init_state)
+    #     print(action)
+    # except Exception as e:
+    #     print(e)
 
 if __name__=="__main__":
     main()
