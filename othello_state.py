@@ -2,7 +2,6 @@ from mcts.base.base import BaseState
 from AlphaOthello.OthelloGame import OthelloGame
 
 import numpy as np
-from copy import deepcopy
 
 class OthelloState(BaseState):
 
