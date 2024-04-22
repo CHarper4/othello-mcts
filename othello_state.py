@@ -11,8 +11,10 @@ class OthelloState(BaseState):
         self.player = player
     
     #returns an iterable of all possible actions
-    def get_possible_actions(self):
-        valid_moves = self.game.getValidMoves(self.board, self.player)
+    def get_possible_actions(self, p=None):
+        if not p:
+            p = self.player
+        valid_moves = self.game.getValidMoves(self.board, p)
         valid_moves = np.where(valid_moves==1)[0]   #convert binary array to indices/acceptable moves
         return valid_moves
         
@@ -33,3 +35,9 @@ class OthelloState(BaseState):
     #returns the reward for this state; only needed for terminal states
     def get_reward(self):
         return self.game.getScore(self.board, self.player)
+    
+    #returns current board
+    def get_board(self, p=None):
+        if not p:
+            p = self.player
+        return self.board * p
