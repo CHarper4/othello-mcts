@@ -1,11 +1,5 @@
 from mcts.base.base import BaseState
-
-from AlphaOthello.OthelloGame import OthelloGame
-
 import math
-
-directions = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0),(1, -1), (0, -1)] #8 surrounding directions
-corners = [0, 5, 30, 35] #corner moves
 
 #-------single-heuristic policies
 def actual_mobility_policy(state: BaseState) -> float:
@@ -170,6 +164,7 @@ def corner_value(state: BaseState) -> float:
     opp_corner_value += 3*len([a for a in state.get_possible_actions(p=opp) if a in corner_moves])
     return normalize(player_corner_value, opp_corner_value)
 
+#-------final policies
 #evaluates state on linear combination of mobility, stability, coin parity, and corner control
     #takes weights as argument, otherwise uses default weights
 def component_policy(state: BaseState, **kwargs):
@@ -197,14 +192,22 @@ def component_policy(state: BaseState, **kwargs):
 
 #prioritizes moves based on static weight table
 def weight_table_policy(state: BaseState) -> float:
-    weights = [[4, -3, 2, 2, 2, 2, -3, 4],
-            [-3, -4, -1, -1, -1, -1, -4, -3],
-            [2, -1, 1, 0, 0, 1, -1, 2],
-            [2, -1, 0, 1, 1, 0, -1, 2],
-            [2, -1, 0, 1, 1, 0, -1, 2],
-            [2, -1, 1, 0, 0, 1, -1, 2],
-            [-3, -4, -1, -1, -1, -1, -4, -3],
-            [4, -3, 2, 2, 2, 2, -3, 4]]
+    # weights = [[4, -3, 2, 2, 2, 2, -3, 4],
+    #         [-3, -4, -1, -1, -1, -1, -4, -3],
+    #         [2, -1, 1, 0, 0, 1, -1, 2],
+    #         [2, -1, 0, 1, 1, 0, -1, 2],
+    #         [2, -1, 0, 1, 1, 0, -1, 2],
+    #         [2, -1, 1, 0, 0, 1, -1, 2],
+    #         [-3, -4, -1, -1, -1, -1, -4, -3],
+    #         [4, -3, 2, 2, 2, 2, -3, 4]]
+
+    #weights scaled down to 6x6
+    reduced_weights = [[100, -25, 10, 10, -25, 100],
+            [-25, -25, 2, 2, -25, -25],
+            [7, 1, 5, 5, 1, 7],
+            [7, 1, 5, 5, 1, 7],
+            [-25, -25, 2, 2, -25, -25],
+            [100, -25, 10, 10, -25, 100]]
     
     def get_state_value(board, player):
         state_value = 0
@@ -212,7 +215,7 @@ def weight_table_policy(state: BaseState) -> float:
         for i in range(len(b)):
             for j, val in enumerate(list(b[i])):
                 if val == player:
-                    state_value += val*weights[i][j]
+                    state_value += val*reduced_weights[i][j]
         return state_value
     
     while not state.is_terminal():
@@ -228,6 +231,3 @@ def weight_table_policy(state: BaseState) -> float:
                 best_action = action
         state = state.take_action(best_action)
     return state.get_reward()
-
-def corner_policy(state: BaseState) -> float:
-    pass
