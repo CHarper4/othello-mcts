@@ -9,22 +9,54 @@
 # }
 
 from mcts.searcher.mcts import MCTS
-from mcts.base.base import BaseState
 from othello_state import OthelloState
 
 from AlphaOthello.OthelloGame import OthelloGame
 from AlphaOthello.OthelloPlayers import HumanOthelloPlayer, GreedyOthelloPlayer
 
-from policies import actual_mobility_policy, potential_mobility_policy
+from policies import weight_table_policy, component_policy
 
-import time
 from tqdm import tqdm
 import ast
-import numpy as np
 
-#TODO: stability, corner policies
-#TODO: alpha-beta search to test against
-#TODO: test runs for policies
+#returns list of game stats, each containing the score from policy1's perspective and the number of turns
+def policy_v_policy_test(search_time, policy1=None, policy2=None):
+    game = OthelloGame(6)
+    def mcts1_move(board, player):
+        searcher = MCTS(time_limit=search_time, rollout_policy=policy1)
+        state = OthelloState(board, player)
+        action = searcher.search(initial_state=state)
+        return action
+    def mcts2_move(board, player):
+        searcher = MCTS(time_limit=search_time, rollout_policy=policy2)
+        state = OthelloState(board, player)
+        action = searcher.search(initial_state=state)
+        return action
+    scores = []
+    mcts_player = 1 #1/O, -1/X, tracks who mcts is playing as
+
+    #testing loop, 100 iterations
+    for i in tqdm(range(100)):
+        board = game.getInitBoard()
+        turns = 0
+        #first turn alternation
+        if mcts_player == 1:
+            p1, p2 = mcts1_move, mcts2_move
+        else:
+            p1, p2 = mcts2_move, mcts1_move
+        #game loop
+        curr_player = 1
+        while game.getGameEnded(board, 1) == 0:
+            if curr_player == 1:
+                action = p1(board, curr_player)
+                board, curr_player = game.getNextState(board, curr_player, action)
+            else:
+                action = p2(board, curr_player)
+                board, curr_player = game.getNextState(board, curr_player, action)
+            turns += 1
+        scores.append((game.getScore(board, mcts_player), turns))
+        mcts_player *= -1
+    return scores
 
 def policy_test(search_time, policy=None):
 
@@ -40,7 +72,7 @@ def policy_test(search_time, policy=None):
         state = OthelloState(board, player)
         action = searcher.search(initial_state=state)
         return action
-
+    
     scores = []
     mcts_player = 1 #1/O, -1/X, tracks who mcts is playing as
 
@@ -79,7 +111,7 @@ def policy_debug(policy=None):
         return action
 
     def mcts_move(board, player):
-        searcher = MCTS(time_limit=1000, rollout_policy=actual_mobility_policy)
+        searcher = MCTS(time_limit=1000, rollout_policy=policy)
         state = OthelloState(board, player)
         action = searcher.search(initial_state=state)
         return action
@@ -99,38 +131,48 @@ def policy_debug(policy=None):
         game.display(board)
     print("score: %i " % game.getScore(board, 1))  
 
-def main():
-    policy_debug(policy=potential_mobility_policy)
-        
-    # print("mobility policy at 3 secs")
-    # games = config_test(3000, actual_mobility_policy)
-    # mcts_wins = [s for s in games if s[0] > 0]
-    # print("%i mcts wins" % len(mcts_wins))
-    # with open('output/mobMCTS_3.txt', 'w') as f:
-    #     f.write(str(games))
-
+def get_stats(path):
     #get number of wins and average score from file record
-    # with open('output/randMCTS_5.txt', 'r') as f:
-    #     games = ast.literal_eval(f.readline())
-    #     total = 0
-    #     wins = [w[0] for w in games if w[0] > 0]
-    #     print(len(wins))
-    #     for game in games:
-    #         total += game[0]
-    #     print(total/100)
+    with open(path, 'r') as f:
+        games = ast.literal_eval(f.readline())
+        total = 0
+        wins = [w[0] for w in games if w[0] > 0]
+        num_wins = len(wins)
+        for game in games:
+            total += game[0]
+        avg_score = total/100
+    return num_wins, avg_score
 
+def main():
+    # policy_debug(policy=weight_table_policy)
 
-    #-----------LOG-----------
-    # random mcts vs greedy
-    # 1 sec - 60 mcts wins
-    # 3 sec - 72 mcts wins - 1:22:10
-    # 5 sec - 70 mcts wins - 2:15:49 - 8.85 avg score
+    # try:
+    #     print("weight table policy vs component policy at 5 sec")
+    #     games = policy_v_policy_test(5000, policy1=component_policy, policy2=weight_table_policy)
+    #     mcts_wins = [s for s in games if s[0] > 0]
+    #     print("%i mcts wins" % len(mcts_wins))
+    #     with open('output/comp_v_table_5.txt', 'w') as f:
+    #         f.write(str(games))
+    # except Exception as e:
+    #     print("comp v weight table failed: " + str(e))
 
-    # simple mobility mcts vs greedy
-    # 1 sec - 67 mcts wins - 27:27
-    # 3 sec - 93 mcts wins - 1:20:40 - 7.48 avg score
-    # 5 sec - 100 mcts wins - 2:16:12 - 18.04 avg score
+    try:
+        print("weight table policy at 5 sec")
+        games = policy_test(5000, policy=weight_table_policy)
+        mcts_wins = [s for s in games if s[0] > 0]
+        print("%i mcts wins" % len(mcts_wins))
+        with open('output/table_5.txt', 'w') as f:
+            f.write(str(games))
+    except Exception as e:
+        print("weight table failed: " + str(e))
 
+    wins, avg_score = get_stats('output/comp_v_table_5.txt')
+    print(wins)
+    print(avg_score)
+
+    #TODO testing:
+        #weight_table_policy vs greedy
+        #component_policy with dynamic weights vs greedy/weight table
 
 if __name__ == "__main__":
     main()
