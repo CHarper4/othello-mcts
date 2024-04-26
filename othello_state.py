@@ -3,6 +3,7 @@ from AlphaOthello.OthelloGame import OthelloGame
 
 import numpy as np
 
+#MCTS API class implementation for Alpha Zero Othello environment
 class OthelloState(BaseState):
 
     def __init__(self, board, player):
