@@ -7,7 +7,7 @@ import numpy as np
 class OthelloState(BaseState):
 
     def __init__(self, board, player):
-        self.game = OthelloGame(6)
+        self.game = OthelloGame(8)
         self.board = board
         self.player = player
     

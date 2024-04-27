@@ -40,7 +40,6 @@ def potential_mobility_value(state: BaseState) -> float:
                     except IndexError:
                         continue
         return len(potential_squares)
-    
     player_pot_mob = get_pot_mob(state.get_board(), state.get_current_player())
     opp_pot_mob = get_pot_mob(state.get_board(), state.get_current_player() * -1)
     return normalize(player_pot_mob, opp_pot_mob)
@@ -63,17 +62,21 @@ def stability_value(state: BaseState) -> float:
     pass
 
 def corner_value(state: BaseState) -> float:
-    corner_moves = [0, 5, 30, 35]
-    corner_coords = [(0,0), (0,5), (5,0), (5,5)]
     player_corner_value, opp_corner_value = 0, 0
     player, opp = state.get_current_player(), state.get_current_player()*-1
-    for coord in corner_coords: #check each corner for player piece
-        if coord == player:
+    board = state.get_board()
+
+    #check for immediate corner captures
+    corner_coords = [(0,0), (0,7), (7,0), (0,7)]
+    for x, y in corner_coords:
+        if board[x][y] == player:
             player_corner_value += 5 #captured corners weighted 5
-        elif coord == opp:
+        elif board[x][y] == opp:
             opp_corner_value += 5
-    #potential corners weighted 3
-    player_corner_value += 3*len([a for a in state.get_possible_actions(p=player) if a in corner_moves])
+
+    #check for potential corner moves
+    corner_moves = [0, 7, 56, 63]
+    player_corner_value += 3*len([a for a in state.get_possible_actions(p=player) if a in corner_moves]) #potential corners weighted 3
     opp_corner_value += 3*len([a for a in state.get_possible_actions(p=opp) if a in corner_moves])
     return normalize(player_corner_value, opp_corner_value)
 
@@ -104,30 +107,31 @@ def component_policy(state: BaseState):
 
 #uses static weight table for state evaluation
 def weight_table_policy(state: BaseState) -> float:
-    # weights = [[4, -3, 2, 2, 2, 2, -3, 4],
-    #         [-3, -4, -1, -1, -1, -1, -4, -3],
-    #         [2, -1, 1, 0, 0, 1, -1, 2],
-    #         [2, -1, 0, 1, 1, 0, -1, 2],
-    #         [2, -1, 0, 1, 1, 0, -1, 2],
-    #         [2, -1, 1, 0, 0, 1, -1, 2],
-    #         [-3, -4, -1, -1, -1, -1, -4, -3],
-    #         [4, -3, 2, 2, 2, 2, -3, 4]]
+    weights = [[4, -3, 2, 2, 2, 2, -3, 4],
+            [-3, -4, -1, -1, -1, -1, -4, -3],
+            [2, -1, 1, 0, 0, 1, -1, 2],
+            [2, -1, 0, 1, 1, 0, -1, 2],
+            [2, -1, 0, 1, 1, 0, -1, 2],
+            [2, -1, 1, 0, 0, 1, -1, 2],
+            [-3, -4, -1, -1, -1, -1, -4, -3],
+            [4, -3, 2, 2, 2, 2, -3, 4]]
 
-    #weights scaled down to 6x6
-    reduced_weights = [[100, -25, 10, 10, -25, 100],
-            [-25, -25, 2, 2, -25, -25],
-            [7, 1, 5, 5, 1, 7],
-            [7, 1, 5, 5, 1, 7],
-            [-25, -25, 2, 2, -25, -25],
-            [100, -25, 10, 10, -25, 100]]
-    
+    # weights2 = [[100, -25, 10, 5, 5, 10, -25, 100],
+    #         [-25, -25, 2, 2, 2, 2, -25, -25],
+    #         [10, 2, 5, 1, 1, 5, 2, 10],
+    #         [5, 2, 1, 2, 2, 1, 2, 5],
+    #         [5, 2, 1, 2, 2, 1, 2, 5],
+    #         [10, 2, 5, 1, 1, 5, 2, 10],
+    #         [-25, -25, 2, 2, 2, 2, -25, -25],
+    #         [100, -25, 10, 5, 5, 10, -25, 100]]
+
     def get_state_value(board, player):
         state_value = 0
         b = list(board)
         for i in range(len(b)):
             for j, val in enumerate(list(b[i])):
                 if val == player:
-                    state_value += val*reduced_weights[i][j]
+                    state_value += weights[i][j]
         return state_value
     
     while not state.is_terminal():

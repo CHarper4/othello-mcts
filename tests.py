@@ -10,7 +10,7 @@ import ast
 #tests return list of (score, turns) 100 for games
 
 def policy_v_policy_test(search_time, policy1=None, policy2=None):
-    game = OthelloGame(6)
+    game = OthelloGame(8)
     def mcts1_move(board, player):
         searcher = MCTS(time_limit=search_time, rollout_policy=policy1)
         state = OthelloState(board, player)
@@ -49,7 +49,7 @@ def policy_v_policy_test(search_time, policy1=None, policy2=None):
 
 #policy vs greedy player
 def policy_test(search_time, policy=None):
-    game = OthelloGame(6)
+    game = OthelloGame(8)
 
     def greedy_move(board, player):
         greedy_player = GreedyOthelloPlayer(game, player)
@@ -92,20 +92,17 @@ def policy_test(search_time, policy=None):
     return scores
 
 def policy_debug(policy=None):
-    game = OthelloGame(6)
-
+    game = OthelloGame(8)
     def greedy_move(board, player):
         greedy_player = GreedyOthelloPlayer(game, player)
         action = greedy_player.play(board)
         return action
-
     def mcts_move(board, player):
         searcher = MCTS(time_limit=1000, rollout_policy=policy)
         state = OthelloState(board, player)
         action = searcher.search(initial_state=state)
         return action
-
-    curr_player = 1
+    curr_player, turn = 1, 1
     board = game.getInitBoard()
     game.display(board)
     while game.getGameEnded(board, 1) == 0:
@@ -118,7 +115,9 @@ def policy_debug(policy=None):
             action = greedy_move(board, curr_player)
             board, curr_player = game.getNextState(board, curr_player, action)
         game.display(board)
-    print("score: %i " % game.getScore(board, 1))  
+        turn += 1
+    print("score: %i" % game.getScore(board, 1))  
+    print("turns: %i" % turn)
 
 def get_stats(path):
     #get number of wins and average score from file record
