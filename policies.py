@@ -55,12 +55,6 @@ def square_parity_value(state: BaseState) -> float:
             elif val == opp: opp_squares += 1
     return normalize(player_squares, opp_squares)
 
-def stability_value(state: BaseState) -> float:
-    #stable: cannot be flipped for the rest of the game
-    #semi-stable: could be flipped some time in the future
-    #unstable: can be flipped right now
-    pass
-
 def corner_value(state: BaseState) -> float:
     player_corner_value, opp_corner_value = 0, 0
     player, opp = state.get_current_player(), state.get_current_player()*-1
@@ -79,6 +73,12 @@ def corner_value(state: BaseState) -> float:
     player_corner_value += 3*len([a for a in state.get_possible_actions(p=player) if a in corner_moves]) #potential corners weighted 3
     opp_corner_value += 3*len([a for a in state.get_possible_actions(p=opp) if a in corner_moves])
     return normalize(player_corner_value, opp_corner_value)
+
+def stability_value(state: BaseState) -> float:
+    #stable: cannot be flipped for the rest of the game
+    #semi-stable: could be flipped some time in the future
+    #unstable: can be flipped right now
+    pass
 
 #-------policies
 #evaluates state on linear combination of mobility, stability, coin parity, and corner control

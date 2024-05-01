@@ -6,8 +6,9 @@ from AlphaOthello.OthelloPlayers import GreedyOthelloPlayer
 
 from tqdm import tqdm
 import ast
+import time
 
-#tests return list of (score, turns) 100 for games
+#policy tests return list of (score, turns) for 100 games
 
 def policy_v_policy_test(search_time, policy1=None, policy2=None):
     game = OthelloGame(8)
@@ -91,6 +92,7 @@ def policy_test(search_time, policy=None):
     
     return scores
 
+#runs and displays a game against a greedy player
 def policy_debug(policy=None):
     game = OthelloGame(8)
     def greedy_move(board, player):
@@ -119,8 +121,16 @@ def policy_debug(policy=None):
     print("score: %i" % game.getScore(board, 1))  
     print("turns: %i" % turn)
 
+#times heuristic evaluation functions
+def heuristic_time(state, heuristic):
+    start = time.time()
+    r = heuristic(state)
+    end = time.time()
+    print(r)
+    print(str(end-start) + " ms")
+
+#get number of wins and average score from file record
 def get_stats(path):
-    #get number of wins and average score from file record
     with open(path, 'r') as f:
         games = ast.literal_eval(f.readline())
         total = 0
