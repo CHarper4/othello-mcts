@@ -19,12 +19,12 @@ class HumanOthelloPlayer():
         self.display_moves = display_moves
 
     def play(self, board):
-        # display(board)
-        valid = self.game.getValidMoves(board, 1)
+        valid = self.game.getValidMoves(board, -1)
         if self.display_moves:
+            print("Available actions: ", end='')
             for i in range(len(valid)):
                 if valid[i]:
-                    print("[", int(i/self.game.n), int(i%self.game.n), end="] ")
+                    print("[" + str(int(i/self.game.n)) + " " + str(int(i%self.game.n)), end="] ")
         while True:
             input_move = input()
             input_a = input_move.split(" ")
@@ -37,7 +37,6 @@ class HumanOthelloPlayer():
                         if valid[a]:
                             break
                 except ValueError:
-                    # Input needs to be an integer
                     'Invalid integer'
             print('Invalid move')
         return a

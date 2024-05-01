@@ -78,7 +78,7 @@ def policy_test(search_time, policy=None):
             p1, p2 = greedy_move, mcts_move
 
         #game loop
-        curr_player = 1
+        curr_player, turn = 1, 1
         while game.getGameEnded(board, 1) == 0:
             if curr_player == 1:
                 action = p1(board, curr_player)
@@ -99,8 +99,8 @@ def policy_debug(policy=None):
         greedy_player = GreedyOthelloPlayer(game, player)
         action = greedy_player.play(board)
         return action
-    def mcts_move(board, player):
-        searcher = MCTS(time_limit=1000, rollout_policy=policy)
+    def mcts_move(board, player, turn):
+        searcher = MCTS(time_limit=5000, rollout_policy=policy)
         state = OthelloState(board, player)
         action = searcher.search(initial_state=state)
         return action
@@ -127,7 +127,7 @@ def heuristic_time(state, heuristic):
     r = heuristic(state)
     end = time.time()
     print(r)
-    print(str(end-start) + " ms")
+    print(str(end-start) + " s")
 
 #get number of wins and average score from file record
 def get_stats(path):

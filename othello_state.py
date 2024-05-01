@@ -18,7 +18,7 @@ class OthelloState(BaseState):
         valid_moves = self.game.getValidMoves(self.board, p)
         valid_moves = np.where(valid_moves==1)[0]   #convert binary array to indices/acceptable moves
         return valid_moves
-        
+    
     #returns the state which results from taking action
     def take_action(self, action) -> 'BaseState':
         board, player = self.game.getNextState(self.board, self.player, action)

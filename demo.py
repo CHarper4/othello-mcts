@@ -4,10 +4,10 @@ from othello_state import OthelloState
 from AlphaOthello.OthelloGame import OthelloGame
 from AlphaOthello.OthelloPlayers import GreedyOthelloPlayer
 
-from policies import component_policy, weight_table_policy
+from policies import weight_table_policy
 
 def main():
-    game = OthelloGame(6)
+    game = OthelloGame(8)
     board = game.getInitBoard()
     game.display(board)
 
