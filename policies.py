@@ -2,7 +2,7 @@ from mcts.base.base import BaseState
 import math
 from AlphaOthello.OthelloGame import OthelloGame
 
-#-------heuristic value functions for component-based policy
+#-------heuristic value functions for component-based policy-------
 def normalize(player_value, opp_value, min, max) -> float:
     if player_value + opp_value != 0:
         p_val = (player_value-min)/(max-min)
@@ -14,7 +14,7 @@ def normalize(player_value, opp_value, min, max) -> float:
 
 def actual_mobility_value(state: BaseState) -> float:
     player_act_mob = len(state.get_possible_actions())
-    opp_act_mob = len(state.get_possible_actions(-1))#state.get_current_player() *
+    opp_act_mob = len(state.get_possible_actions(-1))
     return normalize(player_act_mob, opp_act_mob, 0, 32)
 
 def potential_mobility_value(state: BaseState) -> float:
@@ -122,7 +122,7 @@ def stability_value(state: BaseState) -> float:
     opp_value = get_stability_value(-state.get_current_player())
     return normalize(player_value, opp_value, 0, 28)
 
-#-------policies
+#-------policies-------
 #evaluates state on linear combination of mobility, stability, coin parity, and corner control
 def component_policy(state: BaseState):
     #weight order: corner, mobility, stability, parity

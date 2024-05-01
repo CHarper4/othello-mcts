@@ -64,7 +64,7 @@ def policy_test(search_time, policy=None):
         return action
     
     scores = []
-    mcts_player = 1 #1/O, -1/X, tracks who mcts is playing as
+    mcts_player = 1 #tracks who mcts is playing as
 
     #testing loop, 100 iterations
     for i in tqdm(range(100)):
@@ -121,7 +121,7 @@ def policy_debug(policy=None):
     print("score: %i" % game.getScore(board, 1))  
     print("turns: %i" % turn)
 
-#times heuristic evaluation functions
+#times heuristic evaluation function
 def heuristic_time(state, heuristic):
     start = time.time()
     r = heuristic(state)

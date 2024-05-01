@@ -1,49 +1,13 @@
 # MCTS from https://github.com/kstruempf/MCTS/tree/main
 # Othello environment and greedy player from https://github.com/suragnair/alpha-zero-general
-#
-# @misc{thakoor2016learning,
-#   title={Learning to play othello without human knowledge},
-#   author={Thakoor, Shantanu and Nair, Surag and Jhunjhunwala, Megha},
-#   year={2016},
-#   publisher={Stanford University, Final Project Report}
-# }
 
 from policies import weight_table_policy, component_policy
 from tests import policy_v_policy_test, policy_debug, policy_test, get_stats, heuristic_time
 
-from AlphaOthello.OthelloGame import OthelloGame
-from AlphaOthello.OthelloPlayers import GreedyOthelloPlayer
-from othello_state import OthelloState
-from policies import stability_value, normalize, corner_value
-
-import numpy as np
-
+#for demonstration/gameplay see demo.py or play.py
 def main():
 
-    # sample_board = [[-1, -1, -1, -1, -1, -1, -1,  0],
-    # [ 1,  1,  1, -1,  1, -1, -1, -1],
-    # [-1,  1,  1,  1, -1,  1, -1,  1],
-    # [ 0,  0,  1,  1, -1, -1,  0,  0],
-    # [ 0,  0, -1,  1, -1,  1,  0,  0],
-    # [ 0,  0,  0, -1,  1,  1, -1,  0],
-    # [ 0,  0,  0,  1,  1,  0,  0,  0],
-    # [ 0,  0,  0,  0,  1,  0,  0,  0]]
-
-    game = OthelloGame(8)
-    board = game.getInitBoard()
-    player = 1
-    for i in range(24):
-        valid_moves = np.where(game.getValidMoves(board, player)==1)[0]
-        action = valid_moves[0]
-        board, player = game.getNextState(board, player, action)
-    game.display(board)
-
-    turn = -1 #account for starting positions
-    for row in board:
-        for val in row:
-            if val != 0: turn += 1
-    print(turn)
-    # policy_debug(policy=component_policy)
+    policy_debug(policy=component_policy)
 
     # #policy v policy
     # try:
