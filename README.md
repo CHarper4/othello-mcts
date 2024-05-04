@@ -11,7 +11,7 @@ The weights assigned to each heuristic adjust according to the stage of the game
 
 **Weight-Table Policy:** Evaluates game states using a static weight table for positions on the board
 
-## Sources:
+## Sources
 Game environment adapted from https://github.com/suragnair/alpha-zero-general
 
 Base MCTS algorithm from https://github.com/kstruempf/MCTS/tree/main
